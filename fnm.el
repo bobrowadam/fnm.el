@@ -66,8 +66,8 @@
 
 ;;;###autoload
 (defun fnm-use (&optional maybe-node-version)
-  "Use the given NODE-VERSION. If NODE-VERSION is nil, use the local project node version,
-if that's also nil, use the default global node version."
+  "Use the given NODE-VERSION. If NODE-VERSION is nil, use the local
+ project node version, if that's also nil, use the default global node version."
   (interactive (list (completing-read "sNode version: " (get-available-fnm-node-versions))))
   (let* ((node-version (or maybe-node-version
                            (fnm-current-project-node-version)
@@ -104,10 +104,6 @@ if that's also nil, use the default global node version."
        (fnm-use node-version-to-run-with)
        ,body
        (fnm-use current-global-node-version))))
-
-(defun fnm-run-command-with-scoped-node-version (command)
-  (if-let ((current-node-version (fnm-current-project-node-version)))
-    (with-temporary-node-version)))
 
 (defun fnm-current-project-node-version ()
   (let ((fnm-use-output (fnm-eval "fnm use;")))
