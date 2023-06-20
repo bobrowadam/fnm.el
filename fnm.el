@@ -5,7 +5,8 @@
 ;; Version: version
 ;; Package-Requires: ((s)
 ;;                    (cl-lib)
-;;                    (exec-path-from-shell))
+;;                    (exec-path-from-shell)
+;;                    (project))
 
 ;; Homepage: homepage
 ;; Keywords: keywords
@@ -39,6 +40,7 @@
 (require 's)
 (require 'cl-lib)
 (require 'exec-path-from-shell)
+(require 'project)
 
 (defun fnm-eval (eval-string)
   (shell-command-to-string (format "zsh; eval \"$(fnm env --use-on-cd)\; %s\"; " eval-string)))
