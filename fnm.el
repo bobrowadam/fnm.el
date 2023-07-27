@@ -41,22 +41,28 @@
 (require 'cl-lib)
 (require 'exec-path-from-shell)
 (require 'project)
+(require 'rx)
+
+(defvar user-home-dir (getenv "HOME"))
 
 (defun fnm-eval (eval-string)
   (shell-command-to-string (format "zsh; eval \"$(fnm env --use-on-cd)\; %s\"; " eval-string)))
 
 (defvar fnm-dir
-  (cadr (s-match "FNM_DIR=\"\\(.+\\)\"" (fnm-eval "fnm env")))
+  (cadr (s-match (rx "FNM_DIR=\"" (group (+ any)) "\"") (fnm-eval "fnm env")))
   "The FNM directory")
 
 (defun fnm-current-node-version()
   (s-trim-right (fnm-eval "fnm current")))
 
+
 (defun fnm-default-node-version ()
-  (cadr (s-match "*.+\\(v.+\\) default" (fnm-eval "fnm list"))))
+  (cadr (s-match (rx bol (+ any) (group "v" (+ any)) space "default" eol)
+                 (fnm-eval "fnm list"))))
 
 (defun fnm-node-path (node-version)
-  (car (s-match (rx "/Users/bob/Library/Caches/fnm_multishells" (+ any))
+  (car (s-match (rx (literal (format "%s%s" user-home-dir "/Library/Caches/fnm_multishells"))
+                    (+ any))
             (fnm-eval (format "fnm use %s\; which node" node-version)))))
 
 (defun fnm-node-bin-path (node-version)
@@ -98,7 +104,10 @@
   (cl-remove-if 'nil
              (mapcar
               (lambda (s)
-                (nth 1 (s-match "\\(v.+?\\)\\( default\\|$\\)" s)))
+                (nth 1 (s-match (rx (group "v" (+? any))
+                                    (group (or (: space "default")
+                                               eol)))
+                                s)))
               (s-split "\n"
                        (fnm-eval "fnm list;")))))
 
@@ -123,7 +132,7 @@
                    fnm-use-output)
           (progn (message "No node version found in dotfiles in current directory. directory: %s" default-directory)
                  nil)
-        (cadr (s-match ".+\\(v.+\\)"
+        (cadr (s-match (rx (+ any) (group "v" (+ any)))
                        fnm-use-output)))))
 
 (provide 'fnm)
