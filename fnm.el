@@ -46,15 +46,17 @@
 (defvar user-home-dir (getenv "HOME"))
 
 (defun fnm-eval (eval-string)
-  (shell-command-to-string (format "zsh; eval \"$(fnm env --use-on-cd)\; %s\"; " eval-string)))
+  (shell-command-to-string (format "%s; eval \"$(fnm env --use-on-cd)\; %s\"; "
+                                   shell-file-name
+                                   eval-string)))
 
 (defvar fnm-dir
-  (cadr (s-match (rx "FNM_DIR=\"" (group (+ any)) "\"") (fnm-eval "fnm env")))
+  (cadr (s-match (rx "FNM_DIR=\"" (group (+ any)) "\"")
+                 (fnm-eval "fnm env")))
   "The FNM directory")
 
 (defun fnm-current-node-version()
   (s-trim-right (fnm-eval "fnm current")))
-
 
 (defun fnm-default-node-version ()
   (cadr (s-match (rx bol (+ any) (group "v" (+ any)) space "default" eol)
