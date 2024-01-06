@@ -43,7 +43,7 @@
 (require 'project)
 (require 'rx)
 
-(defvar user-home-dir (getenv "HOME"))
+(defvar fnm/user-home-dir (expand-file-name "~/"))
 
 (defun fnm-eval (eval-string)
   (shell-command-to-string (format "%s; eval \"$(fnm env --use-on-cd)\; %s\"; "
@@ -63,7 +63,7 @@
                  (fnm-eval "fnm list"))))
 
 (defun fnm-node-path (node-version)
-  (car (s-match (rx (literal (format "%s%s" user-home-dir "/Library/Caches/fnm_multishells"))
+  (car (s-match (rx (literal (format "%s%s" fnm/user-home-dir "Library/Caches/fnm_multishells"))
                     (+ any))
             (fnm-eval (format "fnm use %s\; which node" node-version)))))
 
