@@ -4,13 +4,11 @@
 ;; Maintainer: Adam Bobrow
 ;; Version: version
 ;; Package-Requires: ((s)
-;;                    (cl-lib)
 ;;                    (exec-path-from-shell)
-;;                    (project))
+;;                    (project)
+;;                    (rx))
 
-;; Homepage: homepage
-;; Keywords: keywords
-
+;; Homepage: https://github.com/bobrowadam/fnm.el
 
 ;; This file is not part of GNU Emacs
 
@@ -27,7 +25,6 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 ;;; Commentary:
 
 ;; This package provides a wrapper around FNM, the node version manager.
@@ -38,22 +35,14 @@
 
 ;;; Code:
 (require 's)
-(require 'cl-lib)
 (require 'exec-path-from-shell)
 (require 'project)
 (require 'rx)
-
-(defvar fnm/user-home-dir (expand-file-name "~/"))
 
 (defun fnm-eval (eval-string)
   (shell-command-to-string (format "%s; eval \"$(fnm env --use-on-cd)\; %s\"; "
                                    shell-file-name
                                    eval-string)))
-
-(defvar fnm-dir
-  (cadr (s-match (rx "FNM_DIR=\"" (group (+ any)) "\"")
-                 (fnm-eval "fnm env")))
-  "The FNM directory")
 
 (defun fnm-current-node-version()
   (s-trim-right (fnm-eval "fnm current")))
@@ -63,7 +52,9 @@
                  (fnm-eval "fnm list"))))
 
 (defun fnm-node-path (node-version)
-  (car (s-match (rx (literal (format "%s%s" fnm/user-home-dir "Library/Caches/fnm_multishells"))
+  (car (s-match (rx (literal (format "%s%s"
+                                     (expand-file-name "~/")
+                                     "Library/Caches/fnm_multishells"))
                     (+ any))
             (fnm-eval (format "fnm use %s\; which node" node-version)))))
 
@@ -78,7 +69,7 @@
 ;;;###autoload
 (defun fnm-use (&optional maybe-node-version)
   "Use the given NODE-VERSION. If NODE-VERSION is nil, use the local
- project node version, if that's also nil, use the default global node version."
+ project node version, else, use the default global node version."
   (interactive (list (completing-read "sNode version: " (get-available-fnm-node-versions))))
   (let* ((node-version (assert-node-version (or maybe-node-version
                                                 (fnm-current-project-node-version)
@@ -93,7 +84,6 @@
     (exec-path-from-shell-setenv "PATH"
                                  new-path)
     node-version))
-
 
 (defun assert-node-version (node-version)
   (when (not (string-match (rx bol "v" (+ (or num ".")) eol)
@@ -114,6 +104,7 @@
                        (fnm-eval "fnm list;")))))
 
 (defmacro with-temporary-node-version (node-version body)
+  "Use NODE-VERSION for the duration of BODY."
   (declare (indent 1))
   `(let ((current-global-node-version (fnm-current-node-version)))
      (progn
