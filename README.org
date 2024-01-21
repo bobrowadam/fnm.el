@@ -1,1 +1,44 @@
-* FNM.el
+#+TITLE: fnm.el - Emacs wrapper for Fast Node Manager (FNM)
+#+STARTUP: indent
+
+* Introduction
+fnm.el is an Emacs Lisp package providing a simple wrapper around FNM.
+
+* Requirements
+This package depends on the following Emacs packages:
+  - [[https://github.com/magnars/s.el][s]]
+  - [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
+  - [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Version-Control.html][project]]
+  - [[https://www.gnu.org/software/emacs/manual/html_mono/rx.html][rx]]
+
+* Installation
+** With use-package and straight.el
+#+BEGIN_SRC emacs-lisp
+  (use-package fnm
+    :straight (:host github :repo "yourusername/fnm.el"))
+#+END_SRC
+** Using package.el
+TBD (Still not available at MELPA)
+
+
+* Usage
+** Interactive
+To use a specific Node version in your Emacs session:
+
+=M-x fnm-use RET <node-version>=
+
+** Programmatically
+#+begin_src emacs-lisp
+  ;; Use a specific node version:
+  (fnm-use "18")
+
+  ;; Utility functions:
+  (fnm-node-bin-path "18")
+  ==> "/Users/bob/Library/Caches/fnm_multishells/37395_1705833222623/bin"
+
+  (fnm-node-modules-path "18")
+  ==> "/Users/bob/Library/Caches/fnm_multishells/37478_1705833256189/lib/node_modules/"
+#+end_src
+
+* Contributing
+Contributions to fnm.el are welcome!
