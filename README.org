@@ -8,14 +8,12 @@ fnm.el is an Emacs Lisp package providing a simple wrapper around FNM.
 This package depends on the following Emacs packages:
   - [[https://github.com/magnars/s.el][s]]
   - [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
-  - [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Version-Control.html][project]]
-  - [[https://www.gnu.org/software/emacs/manual/html_mono/rx.html][rx]]
 
 * Installation
 ** With use-package and straight.el
 #+BEGIN_SRC emacs-lisp
   (use-package fnm
-    :straight (:host github :repo "yourusername/fnm.el"))
+    :straight (:host github :repo "bobrowadam/fnm.el"))
 #+END_SRC
 ** Using package.el
 TBD (Still not available at MELPA)
