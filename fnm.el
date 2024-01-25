@@ -40,18 +40,22 @@
 (require 'rx)
 
 (defun fnm-eval (eval-string)
+  "Evaluate EVAL-STRING as a shell command after loading FNM environment."
   (shell-command-to-string (format "%s; eval \"$(fnm env --use-on-cd)\; %s\"; "
                                    shell-file-name
                                    eval-string)))
 
 (defun fnm-current-node-version()
+  "Return the current node version as a string."
   (s-trim-right (fnm-eval "fnm current")))
 
 (defun fnm-default-node-version ()
+  "Return the default node version specified by FNM."
   (cadr (s-match (rx bol (+ any) (group "v" (+ any)) space "default" eol)
                  (fnm-eval "fnm list"))))
 
 (defun fnm-node-path (node-version)
+  "Return the path to the node executable for NODE-VERSION."
   (car (s-match (rx (literal (format "%s%s"
                                      (expand-file-name "~/")
                                      "Library/Caches/fnm_multishells"))
@@ -68,9 +72,10 @@
 
 ;;;###autoload
 (defun fnm-use (&optional maybe-node-version)
-  "Use the given NODE-VERSION. If NODE-VERSION is nil, use the local
- project node version, else, use the default global node version."
-  (interactive (list (completing-read "sNode version: " (get-available-fnm-node-versions))))
+  "Use the given MAYBE-NODE-VERSION.
+If MAYBE-NODE-VERSION is nil, use the local project node version,
+else, use the default global node version."
+  (interactive (list (completing-read "Node version: " (get-available-fnm-node-versions))))
   (let* ((node-version (assert-node-version (or maybe-node-version
                                                 (fnm-current-project-node-version)
                                                 (fnm-default-node-version))))
@@ -86,6 +91,7 @@
     node-version))
 
 (defun assert-node-version (node-version)
+  "Assert that NODE-VERSION is a valid node version string."
   (when (not (string-match (rx bol "v" (+ (or num ".")) eol)
                            node-version))
     (error "Not a valid node version: %s" node-version))
@@ -94,14 +100,14 @@
 (defun get-available-fnm-node-versions ()
   "Return a list of available fnm node versions."
   (cl-remove-if 'nil
-             (mapcar
-              (lambda (s)
-                (nth 1 (s-match (rx (group "v" (+? any))
-                                    (group (or (: space "default")
-                                               eol)))
-                                s)))
-              (s-split "\n"
-                       (fnm-eval "fnm list;")))))
+                (mapcar
+                 (lambda (s)
+                   (nth 1 (s-match (rx (group "v" (+? any))
+                                       (group (or (: space "default")
+                                                  eol)))
+                                   s)))
+                 (s-split "\n"
+                          (fnm-eval "fnm list;")))))
 
 (defmacro with-temporary-node-version (node-version body)
   "Use NODE-VERSION for the duration of BODY."
@@ -116,7 +122,8 @@
        (fnm-use current-global-node-version))))
 
 (defun fnm-current-project-node-version ()
-  (if-let* ((project (project-current))
+  "Return the node version specified in the current project's dotfiles."
+  (when-let* ((project (project-current))
             (default-directory (project-root project))
             (fnm-use-output (fnm-eval "fnm use;")))
       (if (s-match "error: Can't find version in dotfiles. Please provide a version manually to the command."
