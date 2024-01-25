@@ -2,7 +2,7 @@
 
 ;; Author: Adam Bobrow
 ;; Maintainer: Adam Bobrow
-;; Version: version
+;; Version: 0.0.1
 ;; Package-Requires: ((s)
 ;;                    (exec-path-from-shell)
 ;;                    (project)
