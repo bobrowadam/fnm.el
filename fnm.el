@@ -3,7 +3,8 @@
 ;; Author: Adam Bobrow
 ;; Maintainer: Adam Bobrow
 ;; Version: 0.0.1
-;; Package-Requires: ((s)
+;; Package-Requires: ((emacs "28.1")
+;;                    (s)
 ;;                    (exec-path-from-shell)
 ;;                    (project)
 ;;                    (rx))
