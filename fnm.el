@@ -61,7 +61,7 @@
                                      (expand-file-name "~/")
                                      "Library/Caches/fnm_multishells"))
                     (+ any))
-            (fnm-eval (format "fnm use %s\; which node" node-version)))))
+                (fnm-eval (format "fnm use %s\; which node" node-version)))))
 
 (defun fnm-node-bin-path (node-version)
   "Return the bin path the given NODE-VERSION."
@@ -80,11 +80,11 @@ else, use the default global node version."
   (let* ((node-version (assert-node-version (or maybe-node-version
                                                 (fnm-current-project-node-version)
                                                 (fnm-default-node-version))))
-        (new-path (concat (fnm-node-bin-path (assert-node-version node-version))
-                          ":"
-                          (s-join ":" (seq-remove
-                                       (lambda (s) (s-contains-p "fnm_multishells" s))
-                                       (s-split ":" (getenv "PATH")))))))
+         (new-path (concat (fnm-node-bin-path (assert-node-version node-version))
+                           ":"
+                           (s-join ":" (seq-remove
+                                        (lambda (s) (s-contains-p "fnm_multishells" s))
+                                        (s-split ":" (getenv "PATH")))))))
     (setenv "PATH" new-path)
     (setenv "NODE_PATH" (fnm-node-modules-path node-version))
     (exec-path-from-shell-setenv "PATH"
@@ -125,14 +125,14 @@ else, use the default global node version."
 (defun fnm-current-project-node-version ()
   "Return the node version specified in the current project's dotfiles."
   (when-let* ((project (project-current))
-            (default-directory (project-root project))
-            (fnm-use-output (fnm-eval "fnm use;")))
-      (if (s-match "error: Can't find version in dotfiles. Please provide a version manually to the command."
-                   fnm-use-output)
-          (progn (message "No node version found in dotfiles in current directory. directory: %s" default-directory)
-                 nil)
-        (cadr (s-match (rx (+ any) (group "v" (+ any)))
-                       fnm-use-output)))))
+              (default-directory (project-root project))
+              (fnm-use-output (fnm-eval "fnm use;")))
+    (if (s-match "error: Can't find version in dotfiles. Please provide a version manually to the command."
+                 fnm-use-output)
+        (progn (message "No node version found in dotfiles in current directory. directory: %s" default-directory)
+               nil)
+      (cadr (s-match (rx (+ any) (group "v" (+ any)))
+                     fnm-use-output)))))
 
 (provide 'fnm)
 ;;; fnm.el ends here
