@@ -81,7 +81,7 @@ else, use the default global node version."
                                                 (fnm-default-node-version))))
         (new-path (concat (fnm-node-bin-path (assert-node-version node-version))
                           ":"
-                          (s-join ":" (cl-remove-if
+                          (s-join ":" (seq-remove
                                        (lambda (s) (s-contains-p "fnm_multishells" s))
                                        (s-split ":" (getenv "PATH")))))))
     (setenv "PATH" new-path)
@@ -99,15 +99,15 @@ else, use the default global node version."
 
 (defun get-available-fnm-node-versions ()
   "Return a list of available fnm node versions."
-  (cl-remove-if 'nil
-                (mapcar
-                 (lambda (s)
-                   (nth 1 (s-match (rx (group "v" (+? any))
-                                       (group (or (: space "default")
-                                                  eol)))
-                                   s)))
-                 (s-split "\n"
-                          (fnm-eval "fnm list;")))))
+  (seq-remove 'null
+              (mapcar
+               (lambda (s)
+                 (nth 1 (s-match (rx (group "v" (+? any))
+                                     (group (or (: space "default")
+                                                eol)))
+                                 s)))
+               (s-split "\n"
+                        (fnm-eval "fnm list;")))))
 
 (defmacro with-temporary-node-version (node-version body)
   "Use NODE-VERSION for the duration of BODY."
