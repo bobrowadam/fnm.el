@@ -110,14 +110,15 @@ else, use the default global node version."
                (s-split "\n"
                         (fnm-eval "fnm list;")))))
 
-(defmacro with-temporary-node-version (node-version body)
+(defmacro with-temporary-node-version (node-version body &optional verbose)
   "Use NODE-VERSION for the duration of BODY."
   (declare (indent 1))
   `(let ((current-global-node-version (fnm-current-node-version)))
      (progn
-       (message "Current global node version is %s. using node version %s for running in the current command"
-                current-global-node-version
-                ,node-version)
+       (when ,verbose
+         (message "Current global node version is %s. using node version %s for running in the current command"
+                  current-global-node-version
+                  ,node-version))
        (fnm-use ,node-version)
        ,body
        (fnm-use current-global-node-version))))
