@@ -59,7 +59,7 @@
   "Return the path to the node executable for NODE-VERSION."
   (car (s-match (rx (literal (format "%s%s"
                                      (expand-file-name "~/")
-                                     "Library/Caches/fnm_multishells"))
+                                     ".local/state/fnm_multishells"))
                     (+ any))
                 (fnm-eval (format "fnm use %s\; which node" node-version)))))
 
