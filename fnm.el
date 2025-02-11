@@ -5,9 +5,7 @@
 ;; Version: 0.0.1
 ;; Package-Requires: ((emacs "28.1")
 ;;                    (s)
-;;                    (exec-path-from-shell)
-;;                    (project)
-;;                    (rx))
+;;                    (exec-path-from-shell))
 
 ;; Homepage: https://github.com/bobrowadam/fnm.el
 
