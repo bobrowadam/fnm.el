@@ -55,11 +55,12 @@
 
 (defun fnm-node-path (node-version)
   "Return the path to the node executable for NODE-VERSION."
-  (car (s-match (rx (literal (format "%s%s"
-                                     (expand-file-name "~/")
-                                     ".local/state/fnm_multishells"))
-                    (+ any))
-                (fnm-eval (format "fnm use %s\; which node" node-version)))))
+  (cl-destructuring-bind (maybe-error path _)
+      (s-split "\n" (fnm-eval (format "fnm use %s\; which node" node-version)))
+    (if (s-contains? "error" maybe-error)
+        ;; TODO: maybe instead of throwing we can ask the user if he wants to install that version
+        (error maybe-error)
+      path)))
 
 (defun fnm-node-bin-path (node-version)
   "Return the bin path the given NODE-VERSION."
