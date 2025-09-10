@@ -15,9 +15,15 @@ This package depends on the following Emacs packages:
   (use-package fnm
     :straight (:host github :repo "bobrowadam/fnm.el"))
 #+END_SRC
+** With use-package and Elpaca
+#+begin_src elisp
+  (use-package fnm
+    :demand t
+    :ensure
+    (:fetcher github :repo "bobrowadam/fnm.el" :branch "main" :files ("fnm.el")))
+#+end_src
 ** Using package.el
 TBD (Still not available at MELPA)
-
 
 * Usage
 ** Interactive
@@ -38,5 +44,64 @@ To use a specific Node version in your Emacs session:
   ==> "/Users/bob/Library/Caches/fnm_multishells/37478_1705833256189/lib/node_modules/"
 #+end_src
 
+* Testing
+fnm.el includes a comprehensive test suite to ensure reliability and correctness.
+** Running Tests
+*** Quick Start
+The easiest way to run tests without installing dependencies:
+#+begin_src bash
+./run-tests.sh
+#+end_src
+
+Or using make directly:
+#+begin_src bash
+make test-standalone
+#+end_src
+
+*** All Test Options
+**** Using the test runner script:
+#+begin_src bash
+./run-tests.sh [option]
+#+end_src
+
+Available options:
+- =standalone= - Run standalone tests (default, no external deps)
+- =unit= - Run unit tests (requires dependencies)
+- =all= - Run all tests including integration tests (requires dependencies + fnm)
+- =integration= - Run only integration tests (requires fnm installed)
+- =interactive= - Open interactive Emacs session with tests loaded
+
+**** Using make directly:
+#+begin_src bash
+make help                 # Show all available targets
+make test-standalone      # Run standalone tests (recommended)
+make test-unit           # Run unit tests (requires dependencies)
+make test                # Run all tests (requires dependencies)
+make test-integration    # Run integration tests (requires fnm)
+make compile            # Byte compile and check for warnings
+#+end_src
+
+** Test Files
+- =test-fnm.el= - Full test suite with external dependencies
+- =test-fnm-standalone.el= - Self-contained test suite (no external packages required)
+
+** Dependencies for Testing
+*** Standalone Tests
+- Only requires Emacs 28.1+ (no external packages)
+
+*** Full Test Suite
+- =s= package (string manipulation library)
+- =exec-path-from-shell= package
+- For integration tests: =fnm= binary installed and in PATH
+
+Install dependencies:
+#+begin_src bash
+make install-deps
+#+end_src
+
 * Contributing
-Contributions to fnm.el are welcome!
+Contributions to fnm.el are welcome! Please run the test suite before submitting changes:
+
+#+begin_src bash
+./run-tests.sh
+#+end_src

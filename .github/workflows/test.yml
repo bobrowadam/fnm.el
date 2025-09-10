@@ -1,0 +1,105 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        emacs-version:
+          - '28.1'
+          - '28.2'
+          - '29.1'
+          - 'snapshot'
+        include:
+          - emacs-version: 'snapshot'
+            allow-failure: true
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Emacs
+      uses: purcell/setup-emacs@master
+      with:
+        version: ${{ matrix.emacs-version }}
+
+    - name: Run standalone tests (no dependencies)
+      run: |
+        emacs --version
+        make test-standalone
+
+    - name: Install dependencies
+      run: |
+        emacs -batch -Q --eval "(progn
+          (require 'package)
+          (setq package-archives '((\"melpa\" . \"https://melpa.org/packages/\")
+                                   (\"gnu\" . \"https://elpa.gnu.org/packages/\")))
+          (package-initialize)
+          (package-refresh-contents)
+          (package-install 's)
+          (package-install 'exec-path-from-shell))"
+
+    - name: Run byte compilation check
+      run: make check
+
+    - name: Run unit tests (with dependencies)
+      run: make test-unit
+      continue-on-error: ${{ matrix.allow-failure == true }}
+
+  test-with-fnm:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Emacs
+      uses: purcell/setup-emacs@master
+      with:
+        version: '29.1'
+
+    - name: Install and setup FNM
+      run: |
+        # Install fnm using the official installer (more reliable)
+        curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir ~/.fnm --skip-shell
+
+        # Add fnm to PATH for this session
+        export PATH="$HOME/.fnm:$PATH"
+
+        # Initialize fnm environment
+        eval "$(~/.fnm/fnm env --use-on-cd)"
+
+        # Install Node versions
+        ~/.fnm/fnm install 18
+        ~/.fnm/fnm install 16
+        ~/.fnm/fnm use 18
+        ~/.fnm/fnm alias 18 default
+
+        # Verify installation
+        ~/.fnm/fnm list
+        ~/.fnm/fnm current
+
+    - name: Install Emacs dependencies
+      run: |
+        emacs -batch -Q --eval "(progn
+          (require 'package)
+          (setq package-archives '((\"melpa\" . \"https://melpa.org/packages/\")
+                                   (\"gnu\" . \"https://elpa.gnu.org/packages/\")))
+          (package-initialize)
+          (package-refresh-contents)
+          (package-install 's)
+          (package-install 'exec-path-from-shell))"
+
+    - name: Run standalone tests (no external deps)
+      run: make test-standalone
+
+    - name: Run integration tests with fnm
+      run: |
+        export PATH="$HOME/.fnm:$PATH"
+        eval "$(~/.fnm/fnm env --use-on-cd)"
+        make test-integration
