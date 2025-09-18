@@ -55,7 +55,7 @@
 
 (defun fnm-node-path (node-version)
   "Return the path to the node executable for NODE-VERSION."
-  (cl-destructuring-bind (maybe-error path _)
+  (seq-let (maybe-error path)
       (s-split "\n" (fnm-eval (format "fnm use %s\; which node" node-version)))
     (if (s-contains? "error" maybe-error)
         ;; TODO: maybe instead of throwing we can ask the user if he wants to install that version
