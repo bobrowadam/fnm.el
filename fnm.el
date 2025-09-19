@@ -37,6 +37,7 @@
 (require 'exec-path-from-shell)
 (require 'project)
 (require 'rx)
+(require 'dash)
 
 (defun fnm-eval (eval-string)
   "Evaluate EVAL-STRING as a shell command after loading FNM environment."
@@ -113,7 +114,8 @@ else, use the default global node version."
                         (fnm-eval "fnm list;")))))
 
 (defmacro with-temporary-node-version (node-version body &optional verbose)
-  "Use NODE-VERSION for the duration of BODY."
+  "Use NODE-VERSION for the duration of BODY.
+pass VERBOSE for extra information."
   (declare (indent 1))
   `(let ((current-global-node-version (fnm-current-node-version)))
      (progn
