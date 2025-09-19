@@ -124,7 +124,7 @@ else, use the default global node version."
 
 (defun fnm-current-project-node-version ()
   "Return the node version specified in the current project's dotfiles."
-  (when-let* ((default-directory (locate-dominating-file (file-name-parent-directory default-directory)
+  (when-let* ((default-directory (locate-dominating-file (file-truename default-directory)
                                                          ".nvmrc"))
               (fnm-use-output (fnm-eval "fnm use;")))
     (if (s-match "error: Can't find version in dotfiles. Please provide a version manually to the command."
