@@ -55,12 +55,15 @@
 
 (defun fnm-node-path (node-version)
   "Return the path to the node executable for NODE-VERSION."
-  (seq-let (maybe-error path)
-      (s-split "\n" (fnm-eval (format "fnm use %s\; which node" node-version)))
-    (if (s-contains? "error" maybe-error)
-        ;; TODO: maybe instead of throwing we can ask the user if he wants to install that version
-        (error maybe-error)
-      path)))
+  (let ((error-or-path
+         (car (--filter
+               (or (s-ends-with? "/bin/node" it)
+                   (s-contains? "error" it t))
+               (s-split "\n" (fnm-eval (format "fnm use %s\; which node" node-version)))))))
+    (when (not (s-ends-with? "/bin/node" error-or-path))
+      ;; TODO: maybe instead of throwing we can ask the user if he wants to install that version
+      (error error-or-path))
+    error-or-path))
 
 (defun fnm-node-bin-path (node-version)
   "Return the bin path the given NODE-VERSION."
