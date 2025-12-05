@@ -79,7 +79,8 @@
   "Use the given MAYBE-NODE-VERSION.
 If MAYBE-NODE-VERSION is nil, use the local project node version,
 else, use the default global node version."
-  (interactive (list (completing-read "Node version: " (get-available-fnm-node-versions))))
+  (interactive (or (list (fnm-current-project-node-version))
+                   (list (completing-read "Node version: " (get-available-fnm-node-versions)))))
   (let* ((node-version (assert-node-version (or maybe-node-version
                                                 (fnm-current-project-node-version)
                                                 (fnm-default-node-version))))
