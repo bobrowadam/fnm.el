@@ -5,7 +5,8 @@
 ;; Version: 0.0.1
 ;; Package-Requires: ((emacs "28.1")
 ;;                    (s)
-;;                    (exec-path-from-shell))
+;;                    (exec-path-from-shell)
+;;                    (dash))
 
 ;; Homepage: https://github.com/bobrowadam/fnm.el
 
@@ -127,6 +128,26 @@ pass VERBOSE for extra information."
        (fnm-use ,node-version)
        ,body
        (fnm-use current-global-node-version))))
+
+(defvar fnm--active-project-root nil
+  "The .nvmrc directory for which `fnm-use' was last called.")
+
+;;;###autoload
+(defun fnm-use-on-project-change ()
+  "Call `fnm-use' when the nearest .nvmrc directory has changed.
+Intended to be used via `fnm-enable-auto-use'."
+  (when-let ((root (locate-dominating-file default-directory ".nvmrc")))
+    (unless (equal root fnm--active-project-root)
+      (setq fnm--active-project-root root)
+      (fnm-use))))
+
+;;;###autoload
+(defun fnm-enable-auto-use ()
+  "Automatically switch node version when opening files in a new project.
+Hooks into `find-file-hook' and switches node version whenever the
+nearest .nvmrc directory changes."
+  (interactive)
+  (add-hook 'find-file-hook #'fnm-use-on-project-change))
 
 (defun fnm-current-project-node-version ()
   "Return the node version specified in the current project's dotfiles."
