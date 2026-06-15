@@ -94,6 +94,7 @@ else, use the default global node version."
     (setenv "NODE_PATH" (fnm-node-modules-path node-version))
     (exec-path-from-shell-setenv "PATH"
                                  new-path)
+    (message "Setup FNM for version %s" node-version)
     node-version))
 
 (defun assert-node-version (node-version)
