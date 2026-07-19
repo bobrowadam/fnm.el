@@ -1,42 +1,70 @@
-#+TITLE: fnm.el - Emacs wrapper for Fast Node Manager (FNM)
+#+TITLE: fnm.el - Emacs integration for Fast Node Manager
 #+STARTUP: indent
 
 * Introduction
-fnm.el is an Emacs Lisp package providing a simple wrapper around FNM.
+fnm.el configures Emacs to use Node.js installations managed by
+[[https://github.com/Schniz/fnm][Fast Node Manager (FNM)]].  It updates =PATH=, =exec-path=, and
+=NODE_PATH= without evaluating shell output.
+
+Version resolution is delegated to =fnm exec=.  FNM recursively resolves
+=.nvmrc=, =.node-version=, and =package.json#engines.node=, then falls back to
+its =default= alias.
 
 * Requirements
-This package depends on the following Emacs packages:
-  - [[https://github.com/magnars/s.el][s]]
-  - [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
+- Emacs 28.1 or later
+- A current =fnm= release with =exec= and =--resolve-engines=, available on
+  =exec-path=
+
+The package has no third-party Emacs Lisp dependencies.
 
 * Installation
 ** With use-package and straight.el
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package fnm
     :straight (:host github :repo "bobrowadam/fnm.el"))
-#+END_SRC
-** Using package.el
-TBD (Still not available at MELPA)
+#+end_src
 
+** Using package.el
+The package is not currently available from MELPA.
 
 * Usage
-** Interactive
-To use a specific Node version in your Emacs session:
+** Select the project or default version
+=M-x fnm-use= asks FNM to resolve the current directory and falls back to its
+=default= alias.
 
-=M-x fnm-use RET <node-version>=
-
-** Programmatically
 #+begin_src emacs-lisp
-  ;; Use a specific node version:
-  (fnm-use "18")
+  (fnm-use)
+#+end_src
 
-  ;; Utility functions:
-  (fnm-node-bin-path "18")
-  ==> "/Users/bob/Library/Caches/fnm_multishells/37395_1705833222623/bin"
+Pass any selector accepted by FNM to select it explicitly:
 
-  (fnm-node-modules-path "18")
-  ==> "/Users/bob/Library/Caches/fnm_multishells/37478_1705833256189/lib/node_modules/"
+#+begin_src emacs-lisp
+  (fnm-use "20")
+  (fnm-use "lts-latest")
+#+end_src
+
+=M-x fnm-use-version= provides completion over installed semantic versions.
+
+** Switch automatically
+Enable the global minor mode to ask FNM to resolve Node when opening files in a
+different directory:
+
+#+begin_src emacs-lisp
+  (fnm-auto-use-mode 1)
+#+end_src
+
+Disable it with =(fnm-auto-use-mode -1)=.  Run =M-x fnm-use= after changing a
+version file in the current directory.
+
+* Configuration
+Set =fnm-executable= when =fnm= is not discoverable on =exec-path=.
+
+* Development
+Run the ERT suite with:
+
+#+begin_src shell
+  emacs -Q --batch -L . -l fnm-test.el -f ert-run-tests-batch-and-exit
 #+end_src
 
 * Contributing
-Contributions to fnm.el are welcome!
+Contributions to fnm.el are welcome.
